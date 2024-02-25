@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "cmsis_os.h"
 #include "dma.h"
 #include "tim.h"
 #include "usart.h"
@@ -81,6 +82,7 @@ volatile uint32_t distance_right = 0;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
 
 void delay_us(uint16_t us)
@@ -92,21 +94,21 @@ void delay_us(uint16_t us)
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
-	if(htim->Instance == TIM3)
+	if(htim->Instance == TIM5)
 	{
-		if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)	// if  interrupt source channel
+		if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)	// if  interrupt source channel
 				{
 					if(captureFlag1 == 0)	// first value is not capture
 					{
-						INC_Value1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);	// read first value
+						INC_Value1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);	// read first value
 						captureFlag1 = 1;	// first captured as true
 
 						// change polarity rising edge to falling edge
-						__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_2, TIM_INPUTCHANNELPOLARITY_FALLING);
+						__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_FALLING);
 					}
 					else if(captureFlag1 == 1)	// if first value already captured
 					{
-						INC_Value2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
+						INC_Value2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
 
 						if(INC_Value2 > INC_Value1)
 						{
@@ -120,8 +122,8 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 						distance_front = echoTime_front / 58;
 						captureFlag1 = 0;
 
-						__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_2, TIM_INPUTCHANNELPOLARITY_RISING);
-						__HAL_TIM_DISABLE_IT(&htim3, TIM_IT_CC2);
+						__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING);
+						__HAL_TIM_DISABLE_IT(&htim5, TIM_IT_CC1);
 					}
 				}
 	}
@@ -210,7 +212,7 @@ void Trig2(void)
 	delay_us(10);								// delay 10us
 	HAL_GPIO_WritePin(TrigC_GPIO_Port, TrigC_Pin, 0);	// Trig Pin Low
 
-	__HAL_TIM_ENABLE_IT(&htim3, TIM_IT_CC2);	// SET Timer Enable
+	__HAL_TIM_ENABLE_IT(&htim5, TIM_IT_CC1);	// SET Timer Enable
 }
 
 void Trig3(void)
@@ -223,25 +225,25 @@ void Trig3(void)
 }
 
 int PWM = 400;
-void go()		// ?ï¿½ï¿½ï¿??????? ?ï¿½ï¿½?ï¿½ï¿½
+void go()		// ?ï¿½ï¿½ï¿½???????? ?ï¿½ï¿½?ï¿½ï¿½
 {
 	HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, 1);	// Right ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½
 	HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, 0);
 	HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, 1);	// Left ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½
 	HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, 0);
-	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?ï¿½ï¿½ ï¿??????? ?ï¿½ï¿½?ï¿½ï¿½
-	htim4.Instance->CCR1 = PWM;		// PWM LEFT?ï¿½ï¿½ ï¿??????? ?ï¿½ï¿½?ï¿½ï¿½
+	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?ï¿½ï¿½ ï¿½???????? ?ï¿½ï¿½?ï¿½ï¿½
+	htim4.Instance->CCR1 = PWM;		// PWM LEFT?ï¿½ï¿½ ï¿½???????? ?ï¿½ï¿½?ï¿½ï¿½
 	//printf("This is Forward Function\r\n");	myDelay(500);
 }
 
-void back()		// ?ï¿½ï¿½ï¿?????? ?ï¿½ï¿½?ï¿½ï¿½
+void back()		// ?ï¿½ï¿½ï¿½??????? ?ï¿½ï¿½?ï¿½ï¿½
 {
 	HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, 0);	// Right ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½
 	HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, 1);
 	HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, 0);	// Left ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½
 	HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, 1);
-	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?ï¿½ï¿½ ï¿??????? ?ï¿½ï¿½?ï¿½ï¿½
-	htim4.Instance->CCR1 = PWM;		// PWM LEFT?ï¿½ï¿½ ï¿??????? ?ï¿½ï¿½?ï¿½ï¿½
+	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?ï¿½ï¿½ ï¿½???????? ?ï¿½ï¿½?ï¿½ï¿½
+	htim4.Instance->CCR1 = PWM;		// PWM LEFT?ï¿½ï¿½ ï¿½???????? ?ï¿½ï¿½?ï¿½ï¿½
 	//printf("This is Backward Function\r\n");	myDelay(500);
 } // end of Backward
 
@@ -261,8 +263,8 @@ void right()		// ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½		// Left ?ï¿½ï¿½?ï¿½ï¿½?ï¿
 	HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, 1);
 	HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, 1);	// Left ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½
 	HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, 0);
-	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?ï¿½ï¿½ ï¿??????? ?ï¿½ï¿½?ï¿½ï¿½
-	htim4.Instance->CCR1 = PWM;		// PWM LEFT?ï¿½ï¿½ ï¿??????? ?ï¿½ï¿½?ï¿½ï¿½
+	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?ï¿½ï¿½ ï¿½???????? ?ï¿½ï¿½?ï¿½ï¿½
+	htim4.Instance->CCR1 = PWM;		// PWM LEFT?ï¿½ï¿½ ï¿½???????? ?ï¿½ï¿½?ï¿½ï¿½
 	//printf("This is Rotate_Right Function\r\n"); myDelay(500);
 } // end of Rotate_R
 
@@ -274,8 +276,8 @@ void left()		// ì¢ŒíšŒ?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½		// Left ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½, Rig
 	HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, 0);
 	HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, 0);	// Left ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½
 	HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, 1);
-	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?ï¿½ï¿½ ï¿??????? ?ï¿½ï¿½?ï¿½ï¿½
-	htim4.Instance->CCR1 = PWM;		// PWM LEFT?ï¿½ï¿½ ï¿??????? ?ï¿½ï¿½?ï¿½ï¿½
+	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?ï¿½ï¿½ ï¿½???????? ?ï¿½ï¿½?ï¿½ï¿½
+	htim4.Instance->CCR1 = PWM;		// PWM LEFT?ï¿½ï¿½ ï¿½???????? ?ï¿½ï¿½?ï¿½ï¿½
 	//printf("This is Rotate_Left Function\r\n");	myDelay(500);
 } // end of Rotate_L
 
@@ -312,14 +314,14 @@ void at_motor()
 		if(distance_right > distance_left)
 		{
 		  left_back();
-		  htim4.Instance->CCR3 = 1000;
+		  htim4.Instance->CCR3 = 400;
 		  htim4.Instance->CCR1 = 0;
 		}
 		else
 		{
 		  right_back();
 		  htim4.Instance->CCR3 = 0;
-		  htim4.Instance->CCR1 = 1000;
+		  htim4.Instance->CCR1 = 400;
 		}
 	}
 	else if(distance_front < 60)
@@ -330,20 +332,20 @@ void at_motor()
 			{
 				right();
 				htim4.Instance->CCR3 = 0;
-				htim4.Instance->CCR1 = 1000;
+				htim4.Instance->CCR1 = 400;
 			}
 			else
 			{
 				left();
-				htim4.Instance->CCR3 = 1000;
+				htim4.Instance->CCR3 = 400;
 				htim4.Instance->CCR1 = 0;
 			}
 		}
 		else
 		{
 			go();
-			htim4.Instance->CCR3 = 1000;
-			htim4.Instance->CCR1 = 1000;
+			htim4.Instance->CCR3 = 400;
+			htim4.Instance->CCR1 = 400;
 		}
 	}
 	else if(distance_left < 14 || distance_right < 14)
@@ -352,20 +354,20 @@ void at_motor()
 		{
 			right();
 			htim4.Instance->CCR3 = 0;
-			htim4.Instance->CCR1 = 1000;
+			htim4.Instance->CCR1 = 400;
 		}
 		else
 		{
 			left();
-			htim4.Instance->CCR3 = 1000;
+			htim4.Instance->CCR3 = 400;
 			htim4.Instance->CCR1 = 0;
 		}
 	}
 	else
 	{
 		go();
-		htim4.Instance->CCR3 = 1000;
-		htim4.Instance->CCR1 = 1000;
+		htim4.Instance->CCR3 = 400;
+		htim4.Instance->CCR1 = 400;
 	}
 }
 
@@ -445,15 +447,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-int __io_putchar(int ch) // printf
-{
-	// console output function
-
-	HAL_UART_Transmit(&huart2, &ch, 1, 10); // 1byte transfer
-	// &ch is stack pointer(ch's data address)
-
-	return ch;
-}
 
 /* USER CODE END 0 */
 
@@ -488,22 +481,32 @@ int main(void)
   MX_DMA_Init();
   MX_USART2_UART_Init();
   MX_USART1_UART_Init();
-  MX_TIM3_Init();
   MX_TIM4_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
+  MX_TIM5_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
   HAL_TIM_Base_Start(&htim1); // delay_us
-	HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1);
-	HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_2);
-	HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_1);
+	HAL_TIM_IC_Start_DMA(&htim2, TIM_CHANNEL_1, distance_left, sizeof(distance_left));
+	HAL_TIM_IC_Start_DMA(&htim5, TIM_CHANNEL_1, distance_front, sizeof(distance_front));
+	HAL_TIM_IC_Start_DMA(&htim1, TIM_CHANNEL_1, distance_right, sizeof(distance_right));
 
 
 //
   /* USER CODE END 2 */
 
+  /* Init scheduler */
+  osKernelInitialize();
+
+  /* Call init function for freertos objects (in freertos.c) */
+  MX_FREERTOS_Init();
+
+  /* Start scheduler */
+  osKernelStart();
+
+  /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -585,7 +588,7 @@ void SystemClock_Config(void)
 
 /**
   * @brief  Period elapsed callback in non blocking mode
-  * @note   This function is called  when TIM5 interrupt took place, inside
+  * @note   This function is called  when TIM9 interrupt took place, inside
   * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
   * a global variable "uwTick" used as application time base.
   * @param  htim : TIM handle
@@ -596,7 +599,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE BEGIN Callback 0 */
 
   /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM5) {
+  if (htim->Instance == TIM9) {
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
