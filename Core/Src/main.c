@@ -225,25 +225,25 @@ void Trig3(void)
 }
 
 int PWM = 400;
-void go()		// ?���???????? ?��?��
+void go()		// ?���????????? ?��?��
 {
 	HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, 1);	// Right ?��?��?��
 	HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, 0);
 	HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, 1);	// Left ?��?��?��
 	HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, 0);
-	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?�� �???????? ?��?��
-	htim4.Instance->CCR1 = PWM;		// PWM LEFT?�� �???????? ?��?��
+	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?�� �????????? ?��?��
+	htim4.Instance->CCR1 = PWM;		// PWM LEFT?�� �????????? ?��?��
 	//printf("This is Forward Function\r\n");	myDelay(500);
 }
 
-void back()		// ?���??????? ?��?��
+void back()		// ?���???????? ?��?��
 {
 	HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, 0);	// Right ?��?��?��
 	HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, 1);
 	HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, 0);	// Left ?��?��?��
 	HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, 1);
-	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?�� �???????? ?��?��
-	htim4.Instance->CCR1 = PWM;		// PWM LEFT?�� �???????? ?��?��
+	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?�� �????????? ?��?��
+	htim4.Instance->CCR1 = PWM;		// PWM LEFT?�� �????????? ?��?��
 	//printf("This is Backward Function\r\n");	myDelay(500);
 } // end of Backward
 
@@ -263,8 +263,8 @@ void right()		// ?��?��?�� ?��?��		// Left ?��?��?�
 	HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, 1);
 	HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, 1);	// Left ?��?��?��
 	HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, 0);
-	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?�� �???????? ?��?��
-	htim4.Instance->CCR1 = PWM;		// PWM LEFT?�� �???????? ?��?��
+	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?�� �????????? ?��?��
+	htim4.Instance->CCR1 = PWM;		// PWM LEFT?�� �????????? ?��?��
 	//printf("This is Rotate_Right Function\r\n"); myDelay(500);
 } // end of Rotate_R
 
@@ -276,8 +276,8 @@ void left()		// 좌회?�� ?��?��		// Left ?��?��?��, Rig
 	HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, 0);
 	HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, 0);	// Left ?��?��?��
 	HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, 1);
-	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?�� �???????? ?��?��
-	htim4.Instance->CCR1 = PWM;		// PWM LEFT?�� �???????? ?��?��
+	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?�� �????????? ?��?��
+	htim4.Instance->CCR1 = PWM;		// PWM LEFT?�� �????????? ?��?��
 	//printf("This is Rotate_Left Function\r\n");	myDelay(500);
 } // end of Rotate_L
 
@@ -304,11 +304,7 @@ void right_back()
 //
 void at_motor()
 {
-	Trig1();
-	  HAL_Delay(1);
-	  Trig2();
-	  HAL_Delay(1);
-	  Trig3();
+
 	if(distance_front < 10)
 	{
 		if(distance_right > distance_left)
@@ -512,10 +508,7 @@ int main(void)
   while (1)
   {
 //	  Forward();
-	  HAL_UART_Receive_IT(&huart1, rx_Data, sizeof(rx_Data));
-	 	 	  if(rx_Data[0] == 'a') flag = !flag;
-	 	 	  if(!flag) bt_motor();
-	 	 	  else at_motor();
+
 //	  printf("%c\r\n", rx_Data[0]);
 ///////////////////////////////////////////////////코드 추�?3
 ////

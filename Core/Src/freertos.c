@@ -22,6 +22,7 @@
 #include "task.h"
 #include "main.h"
 #include "cmsis_os.h"
+#include "usart.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -30,7 +31,10 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+extern uint8_t rx_Data[1];
+extern uint8_t flag;
+extern uint32_t echoTime_front, echoTime_left, echoTime_right;
+extern uint32_t distance_front, distance_left, distance_right;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -128,6 +132,10 @@ void changeModefunc(void *argument)
   /* Infinite loop */
   for(;;)
   {
+	  HAL_UART_Receive_IT(&huart1, rx_Data, sizeof(rx_Data));
+	  	 	 	  if(rx_Data[0] == 'a') flag = !flag;
+	  	 	 	  if(!flag) bt_motor();
+	  	 	 	  else at_motor();
     osDelay(1);
   }
   /* USER CODE END changeModefunc */
@@ -146,6 +154,16 @@ void trigUltrasonicfunc(void *argument)
   /* Infinite loop */
   for(;;)
   {
+	  if(flag)
+	  {
+		  Trig1();
+		  HAL_Delay(1);
+		  Trig2();
+		  HAL_Delay(1);
+		  Trig3();
+		  HAL_Delay(1);
+	  }
+
     osDelay(1);
   }
   /* USER CODE END trigUltrasonicfunc */
