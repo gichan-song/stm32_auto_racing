@@ -223,25 +223,25 @@ void Trig3(void)
 }
 
 int PWM = 400;
-void go()		// ?ï¿½ï¿½ï¿½???? ?ï¿½ï¿½?ï¿½ï¿½
+void go()		// ?ï¿½ï¿½ï¿??????? ?ï¿½ï¿½?ï¿½ï¿½
 {
 	HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, 1);	// Right ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½
 	HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, 0);
 	HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, 1);	// Left ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½
 	HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, 0);
-	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?ï¿½ï¿½ ï¿½???? ?ï¿½ï¿½?ï¿½ï¿½
-	htim4.Instance->CCR1 = PWM;		// PWM LEFT?ï¿½ï¿½ ï¿½???? ?ï¿½ï¿½?ï¿½ï¿½
+	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?ï¿½ï¿½ ï¿??????? ?ï¿½ï¿½?ï¿½ï¿½
+	htim4.Instance->CCR1 = PWM;		// PWM LEFT?ï¿½ï¿½ ï¿??????? ?ï¿½ï¿½?ï¿½ï¿½
 	//printf("This is Forward Function\r\n");	myDelay(500);
 }
 
-void back()		// ?ï¿½ï¿½ï¿½??? ?ï¿½ï¿½?ï¿½ï¿½
+void back()		// ?ï¿½ï¿½ï¿?????? ?ï¿½ï¿½?ï¿½ï¿½
 {
 	HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, 0);	// Right ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½
 	HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, 1);
 	HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, 0);	// Left ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½
 	HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, 1);
-	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?ï¿½ï¿½ ï¿½???? ?ï¿½ï¿½?ï¿½ï¿½
-	htim4.Instance->CCR1 = PWM;		// PWM LEFT?ï¿½ï¿½ ï¿½???? ?ï¿½ï¿½?ï¿½ï¿½
+	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?ï¿½ï¿½ ï¿??????? ?ï¿½ï¿½?ï¿½ï¿½
+	htim4.Instance->CCR1 = PWM;		// PWM LEFT?ï¿½ï¿½ ï¿??????? ?ï¿½ï¿½?ï¿½ï¿½
 	//printf("This is Backward Function\r\n");	myDelay(500);
 } // end of Backward
 
@@ -261,8 +261,8 @@ void right()		// ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½		// Left ?ï¿½ï¿½?ï¿½ï¿½?ï¿
 	HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, 1);
 	HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, 1);	// Left ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½
 	HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, 0);
-	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?ï¿½ï¿½ ï¿½???? ?ï¿½ï¿½?ï¿½ï¿½
-	htim4.Instance->CCR1 = PWM;		// PWM LEFT?ï¿½ï¿½ ï¿½???? ?ï¿½ï¿½?ï¿½ï¿½
+	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?ï¿½ï¿½ ï¿??????? ?ï¿½ï¿½?ï¿½ï¿½
+	htim4.Instance->CCR1 = PWM;		// PWM LEFT?ï¿½ï¿½ ï¿??????? ?ï¿½ï¿½?ï¿½ï¿½
 	//printf("This is Rotate_Right Function\r\n"); myDelay(500);
 } // end of Rotate_R
 
@@ -274,8 +274,8 @@ void left()		// ì¢ŒíšŒ?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½		// Left ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½, Rig
 	HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, 0);
 	HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, 0);	// Left ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½
 	HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, 1);
-	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?ï¿½ï¿½ ï¿½???? ?ï¿½ï¿½?ï¿½ï¿½
-	htim4.Instance->CCR1 = PWM;		// PWM LEFT?ï¿½ï¿½ ï¿½???? ?ï¿½ï¿½?ï¿½ï¿½
+	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?ï¿½ï¿½ ï¿??????? ?ï¿½ï¿½?ï¿½ï¿½
+	htim4.Instance->CCR1 = PWM;		// PWM LEFT?ï¿½ï¿½ ï¿??????? ?ï¿½ï¿½?ï¿½ï¿½
 	//printf("This is Rotate_Left Function\r\n");	myDelay(500);
 } // end of Rotate_L
 
@@ -302,48 +302,29 @@ void right_back()
 //
 void at_motor()
 {
-	if(flag == 1)
+	Trig1();
+	  HAL_Delay(1);
+	  Trig2();
+	  HAL_Delay(1);
+	  Trig3();
+	if(distance_front < 10)
 	{
-		if(distance_front < 10)
+		if(distance_right > distance_left)
 		{
-			if(distance_right > distance_left)
-			{
-			  left_back();
-			  htim4.Instance->CCR3 = 1000;
-			  htim4.Instance->CCR1 = 0;
-			}
-			else
-			{
-			  right_back();
-			  htim4.Instance->CCR3 = 0;
-			  htim4.Instance->CCR1 = 1000;
-			}
+		  left_back();
+		  htim4.Instance->CCR3 = 1000;
+		  htim4.Instance->CCR1 = 0;
 		}
-		else if(distance_front < 60)
+		else
 		{
-			if(distance_left < 20 || distance_right < 20)
-			{
-				if(distance_left < distance_right)
-				{
-					right();
-					htim4.Instance->CCR3 = 0;
-					htim4.Instance->CCR1 = 1000;
-				}
-				else
-				{
-					left();
-					htim4.Instance->CCR3 = 1000;
-					htim4.Instance->CCR1 = 0;
-				}
-			}
-			else
-			{
-				go();
-				htim4.Instance->CCR3 = 1000;
-				htim4.Instance->CCR1 = 1000;
-			}
+		  right_back();
+		  htim4.Instance->CCR3 = 0;
+		  htim4.Instance->CCR1 = 1000;
 		}
-		else if(distance_left < 14 || distance_right < 14)
+	}
+	else if(distance_front < 60)
+	{
+		if(distance_left < 20 || distance_right < 20)
 		{
 			if(distance_left < distance_right)
 			{
@@ -364,6 +345,27 @@ void at_motor()
 			htim4.Instance->CCR3 = 1000;
 			htim4.Instance->CCR1 = 1000;
 		}
+	}
+	else if(distance_left < 14 || distance_right < 14)
+	{
+		if(distance_left < distance_right)
+		{
+			right();
+			htim4.Instance->CCR3 = 0;
+			htim4.Instance->CCR1 = 1000;
+		}
+		else
+		{
+			left();
+			htim4.Instance->CCR3 = 1000;
+			htim4.Instance->CCR1 = 0;
+		}
+	}
+	else
+	{
+		go();
+		htim4.Instance->CCR3 = 1000;
+		htim4.Instance->CCR1 = 1000;
 	}
 }
 
@@ -508,20 +510,10 @@ int main(void)
   {
 //	  Forward();
 	  HAL_UART_Receive_IT(&huart1, rx_Data, sizeof(rx_Data));
-	  printf("%c\r\n", rx_Data[0]);
-	  if(rx_Data[0] == 'a') flag = !flag;
-	  if(!flag) bt_motor();
-	  else at_motor();
-	  Trig1();
-//	  HAL_Delay(10);
-	  Trig2();
-//	  HAL_Delay(10);
-	  Trig3();
+	 	 	  if(rx_Data[0] == 'a') flag = !flag;
+	 	 	  if(!flag) bt_motor();
+	 	 	  else at_motor();
 //	  printf("%c\r\n", rx_Data[0]);
-	  printf("sonic left: %d\r\n", distance_left);
-	  printf("sonic center: %d\r\n", distance_front);
-	  printf("sonic right: %d\r\n", distance_right);
-//	  HAL_Delay(200);
 ///////////////////////////////////////////////////ì½”ë“œ ì¶”ï¿½?3
 ////
 
@@ -590,6 +582,27 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
+
+/**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM5 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM5) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.

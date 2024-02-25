@@ -11,9 +11,10 @@
 ../Core/Src/main.c:285:6:left_back	8	static
 ../Core/Src/main.c:293:6:right_back	8	static
 ../Core/Src/main.c:303:6:at_motor	8	static
-../Core/Src/main.c:374:6:bt_motor	8	static
-../Core/Src/main.c:432:6:HAL_UART_RxCpltCallback	16	static
-../Core/Src/main.c:446:5:__io_putchar	16	static
-../Core/Src/main.c:462:5:main	8	static
-../Core/Src/main.c:548:6:SystemClock_Config	88	static
-../Core/Src/main.c:598:6:Error_Handler	4	static,ignoring_inline_asm
+../Core/Src/main.c:376:6:bt_motor	8	static
+../Core/Src/main.c:434:6:HAL_UART_RxCpltCallback	16	static
+../Core/Src/main.c:448:5:__io_putchar	16	static
+../Core/Src/main.c:464:5:main	8	static
+../Core/Src/main.c:540:6:SystemClock_Config	88	static
+../Core/Src/main.c:594:6:HAL_TIM_PeriodElapsedCallback	16	static
+../Core/Src/main.c:611:6:Error_Handler	4	static,ignoring_inline_asm
