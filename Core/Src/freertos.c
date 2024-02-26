@@ -135,7 +135,6 @@ void changeModefunc(void *argument)
 	  HAL_UART_Receive_IT(&huart1, rx_Data, sizeof(rx_Data));
 	  	 	 	  if(rx_Data[0] == 'a') flag = !flag;
 	  	 	 	  if(!flag) bt_motor();
-	  	 	 	  else at_motor();
     osDelay(1);
   }
   /* USER CODE END changeModefunc */
@@ -157,14 +156,12 @@ void trigUltrasonicfunc(void *argument)
 	  if(flag)
 	  {
 		  Trig1();
-		  HAL_Delay(1);
+		  osDelay(1);
 		  Trig2();
-		  HAL_Delay(1);
+		  osDelay(1);
 		  Trig3();
-		  HAL_Delay(1);
+		  osDelay(100);
 	  }
-
-    osDelay(1);
   }
   /* USER CODE END trigUltrasonicfunc */
 }

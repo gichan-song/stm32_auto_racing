@@ -1,3 +1,3 @@
 ../Core/Src/freertos.c:84:6:MX_FREERTOS_Init	1
 ../Core/Src/freertos.c:129:6:changeModefunc	3
-../Core/Src/freertos.c:151:6:trigUltrasonicfunc	2
+../Core/Src/freertos.c:150:6:trigUltrasonicfunc	2

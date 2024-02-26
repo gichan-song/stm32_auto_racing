@@ -57,8 +57,24 @@
 
 uint8_t rx_Data[1];
 uint8_t state = 0;
-//////////////////////////////////////////////////////// 코드 추�?1
 uint8_t flag = 0;
+int PWM = 250;
+
+#define ARRAYNUM 5
+int readings_front[ARRAYNUM];      // the readings_front from the analog input
+int idx_front = 0;              // the index of the current reading
+int total_front = 0;                  // the running total_front
+int average_front = 0;
+
+int readings_left[ARRAYNUM];      // the readings from the analog input
+int idx_left = 0;              // the index of the current reading
+int total_left = 0;                  // the running total
+int average_left = 0;
+
+int readings_right[ARRAYNUM];      // the readings from the analog input
+int idx_right = 0;              // the index of the current reading
+int total_right = 0;                  // the running total
+int average_right = 0;
 
 volatile uint32_t INC_Value1 = 0;
 volatile uint32_t INC_Value2 = 0;
@@ -96,104 +112,159 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
 	if(htim->Instance == TIM5)
 	{
-		if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)	// if  interrupt source channel
-				{
-					if(captureFlag1 == 0)	// first value is not capture
-					{
-						INC_Value1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);	// read first value
-						captureFlag1 = 1;	// first captured as true
+		if(captureFlag1 == 0)	// first value is not capture
+		{
+			INC_Value1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);	// read first value
+			captureFlag1 = 1;	// first captured as true
 
-						// change polarity rising edge to falling edge
-						__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_FALLING);
-					}
-					else if(captureFlag1 == 1)	// if first value already captured
-					{
-						INC_Value2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+			// change polarity rising edge to falling edge
+			__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_FALLING);
+		}
+		else if(captureFlag1 == 1)	// if first value already captured
+		{
+			INC_Value2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
 
-						if(INC_Value2 > INC_Value1)
-						{
-							echoTime_front = INC_Value2 - INC_Value1;
-						}
-						else if(INC_Value2 < INC_Value1)
-						{
-							echoTime_front = (0xffff - INC_Value1) + INC_Value2;
-						}
+			if(INC_Value2 > INC_Value1)
+			{
+				echoTime_front = INC_Value2 - INC_Value1;
+			}
+			else if(INC_Value2 < INC_Value1)
+			{
+				echoTime_front = (0xffff - INC_Value1) + INC_Value2;
+			}
 
-						distance_front = echoTime_front / 58;
-						captureFlag1 = 0;
+			distance_front = echoTime_front / 58;
+			captureFlag1 = 0;
 
-						__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING);
-						__HAL_TIM_DISABLE_IT(&htim5, TIM_IT_CC1);
-					}
-				}
+			 total_front = total_front - readings_front[idx_front];
+				  // read from the sensor:
+				  readings_front[idx_front] = distance_front;
+				  // add the reading to the total_front:
+				  total_front = total_front + readings_front[idx_front];
+				  // advance to the next position in the array:
+				  idx_front = idx_front + 1;
+
+				  // if we're at the end of the array...
+				  if (idx_front >= ARRAYNUM) {
+					  // ...wrap around to the beginning:
+					  idx_front = 0;
+				  }
+				  // calculate the average_front:
+				  average_front = total_front / ARRAYNUM;
+
+			__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING);
+			__HAL_TIM_DISABLE_IT(&htim5, TIM_IT_CC1);
+		}
 	}
-
-	if(htim->Instance == TIM2)
+	else if(htim->Instance == TIM2)
 	{
-		if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)	// if  interrupt source channel
-				{
-					if(captureFlag2 == 0)	// first value is not capture
-					{
-						INC_Value3 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);	// read first value
-						captureFlag2 = 1;	// first captured as true
+		if(captureFlag2 == 0)	// first value is not capture
+		{
+			INC_Value3 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);	// read first value
+			captureFlag2 = 1;	// first captured as true
 
-						// change polarity rising edge to falling edge
-						__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_FALLING);
-					}
-					else if(captureFlag2 == 1)	// if first value already captured
-					{
-						INC_Value4 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+			// change polarity rising edge to falling edge
+			__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_FALLING);
+		}
+		else if(captureFlag2 == 1)	// if first value already captured
+		{
+			INC_Value4 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
 
-						if(INC_Value4  > INC_Value3)
-						{
-							echoTime_left = INC_Value4 - INC_Value3;
-						}
-						else if(INC_Value4 < INC_Value3)
-						{
-							echoTime_left = (0xffff - INC_Value3) + INC_Value4;
-						}
+			if(INC_Value4  > INC_Value3)
+			{
+				echoTime_left = INC_Value4 - INC_Value3;
+			}
+			else if(INC_Value4 < INC_Value3)
+			{
+				echoTime_left = (0xffff - INC_Value3) + INC_Value4;
+			}
 
-						distance_left = echoTime_left / 58;
-						captureFlag2 = 0;
+			distance_left = echoTime_left / 58;
+			captureFlag2 = 0;
 
-						__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING);
-						__HAL_TIM_DISABLE_IT(&htim2, TIM_IT_CC1);
-					}
-				}
+			total_left = total_left - readings_left[idx_left];
+				  // read from the sensor:
+				  readings_left[idx_left] = distance_left;
+				  // add the reading to the total:
+				  total_left = total_left + readings_left[idx_left];
+				  // advance to the next position in the array:
+				  idx_left = idx_left + 1;
+
+				  // if we're at the end of the array...
+				  if (idx_left >= ARRAYNUM) {
+					  // ...wrap around to the beginning:
+					  idx_left = 0;
+				  }
+				  // calculate the average:
+				  average_left = total_left / ARRAYNUM;
+
+			__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING);
+			__HAL_TIM_DISABLE_IT(&htim2, TIM_IT_CC1);
+		}
 	}
-
-	if(htim->Instance == TIM1)
+	else if(htim->Instance == TIM1)
 	{
-		if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)	// if  interrupt source channel
-					{
-					if(captureFlag3 == 0)	// first value is not capture
-					{
-						INC_Value5 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);	// read first value
-						captureFlag3 = 1;	// first captured as true
+		if(captureFlag3 == 0)	// first value is not capture
+		{
+			INC_Value5 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);	// read first value
+			captureFlag3 = 1;	// first captured as true
 
-						// change polarity rising edge to falling edge
-						__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_FALLING);
-					}
-					else if(captureFlag3 == 1)	// if first value already captured
-					{
-						INC_Value6 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+			// change polarity rising edge to falling edge
+			__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_FALLING);
+		}
+		else if(captureFlag3 == 1)	// if first value already captured
+		{
+			INC_Value6 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
 
-						if(INC_Value6 > INC_Value5)
-						{
-							echoTime_right = INC_Value6 - INC_Value5;
-						}
-						else if(INC_Value6 < INC_Value5)
-						{
-							echoTime_right = (0xffff - INC_Value5) + INC_Value6;
-						}
+			if(INC_Value6 > INC_Value5)
+			{
+				echoTime_right = INC_Value6 - INC_Value5;
+			}
+			else if(INC_Value6 < INC_Value5)
+			{
+				echoTime_right = (0xffff - INC_Value5) + INC_Value6;
+			}
 
-						distance_right = echoTime_right / 58;
-						captureFlag3 = 0;
+			distance_right = echoTime_right / 58;
+			captureFlag3 = 0;
 
-						__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING);
-						__HAL_TIM_DISABLE_IT(&htim1, TIM_IT_CC1);
-					}
-				}
+			 total_right = total_right - readings_right[idx_right];
+				  // read from the sensor:
+				  readings_right[idx_right] = distance_right;
+				  // add the reading to the total:
+				  total_right = total_right + readings_right[idx_right];
+				  // advance to the next position in the array:
+				  idx_right = idx_right + 1;
+
+				  // if we're at the end of the array...
+				  if (idx_right >= ARRAYNUM) {
+					  // ...wrap around to the beginning:
+					  idx_right = 0;
+				  }
+				  // calculate the average:
+				  average_right = total_right / ARRAYNUM;
+
+			__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING);
+			__HAL_TIM_DISABLE_IT(&htim1, TIM_IT_CC1);
+		}
+	}
+//	if(average_front < 10)
+//	{
+//		stop();
+//		return;
+//	}
+	go();
+	if(average_right < 30){
+		left();
+		return;
+	}
+	if(average_left < 30){
+		right();
+		return;
+	}
+	if(average_front < 15){
+		right();
+		return;
 	}
 }
 
@@ -224,26 +295,21 @@ void Trig3(void)
 	__HAL_TIM_ENABLE_IT(&htim1, TIM_IT_CC1);	// SET Timer Enable
 }
 
-int PWM = 400;
-void go()		// ?���????????? ?��?��
+void go()		// ?���?????????? ?��?��
 {
 	HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, 1);	// Right ?��?��?��
 	HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, 0);
 	HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, 1);	// Left ?��?��?��
 	HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, 0);
-	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?�� �????????? ?��?��
-	htim4.Instance->CCR1 = PWM;		// PWM LEFT?�� �????????? ?��?��
 	//printf("This is Forward Function\r\n");	myDelay(500);
 }
 
-void back()		// ?���???????? ?��?��
+void back()		// ?���????????? ?��?��
 {
 	HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, 0);	// Right ?��?��?��
 	HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, 1);
 	HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, 0);	// Left ?��?��?��
 	HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, 1);
-	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?�� �????????? ?��?��
-	htim4.Instance->CCR1 = PWM;		// PWM LEFT?�� �????????? ?��?��
 	//printf("This is Backward Function\r\n");	myDelay(500);
 } // end of Backward
 
@@ -259,26 +325,20 @@ void stop()
 
 void right()		// ?��?��?�� ?��?��		// Left ?��?��?��, Right ?��?��?��
 {
-	HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, 0);	// Right ?��?��?��
-	HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, 1);
-	HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, 1);	// Left ?��?��?��
-	HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, 0);
-	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?�� �????????? ?��?��
-	htim4.Instance->CCR1 = PWM;		// PWM LEFT?�� �????????? ?��?��
-	//printf("This is Rotate_Right Function\r\n"); myDelay(500);
+	HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, 1);	// Right ?��?��?��
+	HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, 0);
+	HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, 0);	// Left ?��?��?��
+	HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, 1);
 } // end of Rotate_R
 
 
 
 void left()		// 좌회?�� ?��?��		// Left ?��?��?��, Right ?��?��?��
 {
-	HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, 1);	// Right ?��?��?��
-	HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, 0);
-	HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, 0);	// Left ?��?��?��
-	HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, 1);
-	htim4.Instance->CCR3 = PWM;		// PWM RIGHT?�� �????????? ?��?��
-	htim4.Instance->CCR1 = PWM;		// PWM LEFT?�� �????????? ?��?��
-	//printf("This is Rotate_Left Function\r\n");	myDelay(500);
+	HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, 0);	// Right ?��?��?��
+	HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, 1);
+	HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, 1);	// Left ?��?��?��
+	HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, 0);
 } // end of Rotate_L
 
 ///////////////////////////////////////////////////코드 추�?2
@@ -299,73 +359,6 @@ void right_back()
 	HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, 0);
 	HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, 1);
 }
-//
-//
-//
-void at_motor()
-{
-
-	if(distance_front < 10)
-	{
-		if(distance_right > distance_left)
-		{
-		  left_back();
-		  htim4.Instance->CCR3 = 400;
-		  htim4.Instance->CCR1 = 0;
-		}
-		else
-		{
-		  right_back();
-		  htim4.Instance->CCR3 = 0;
-		  htim4.Instance->CCR1 = 400;
-		}
-	}
-	else if(distance_front < 60)
-	{
-		if(distance_left < 20 || distance_right < 20)
-		{
-			if(distance_left < distance_right)
-			{
-				right();
-				htim4.Instance->CCR3 = 0;
-				htim4.Instance->CCR1 = 400;
-			}
-			else
-			{
-				left();
-				htim4.Instance->CCR3 = 400;
-				htim4.Instance->CCR1 = 0;
-			}
-		}
-		else
-		{
-			go();
-			htim4.Instance->CCR3 = 400;
-			htim4.Instance->CCR1 = 400;
-		}
-	}
-	else if(distance_left < 14 || distance_right < 14)
-	{
-		if(distance_left < distance_right)
-		{
-			right();
-			htim4.Instance->CCR3 = 0;
-			htim4.Instance->CCR1 = 400;
-		}
-		else
-		{
-			left();
-			htim4.Instance->CCR3 = 400;
-			htim4.Instance->CCR1 = 0;
-		}
-	}
-	else
-	{
-		go();
-		htim4.Instance->CCR3 = 400;
-		htim4.Instance->CCR1 = 400;
-	}
-}
 
 /////////////////////////////////////////////////코드 추�?2
 
@@ -380,11 +373,11 @@ void bt_motor()
 	}
 	else if(rx_Data[0] == 'M')
 	{
-		PWM = 300;
+		PWM = 400;
 	}
 	else if(rx_Data[0] == 'L')
 	{
-		PWM = 100;
+		PWM = 250;
 	}
 	else if(rx_Data[0] == 'f')
 	{
@@ -411,20 +404,30 @@ void bt_motor()
 
 	if(state == 'f'){
 		go();
+		htim4.Instance->CCR3 = PWM;
+		htim4.Instance->CCR1 = PWM;
 	}
 	else if(state == 's')
 	{
 		stop();
+		htim4.Instance->CCR3 = PWM;
+		htim4.Instance->CCR1 = PWM;
 	}
 	else if(state == 'l'){
 		left();
+		htim4.Instance->CCR3 = PWM;
+		htim4.Instance->CCR1 = PWM;
 	}
 	else if(state == 'r'){
 		right();
+		htim4.Instance->CCR3 = PWM;
+		htim4.Instance->CCR1 = PWM;
 	}
 	else if(state == 'b')
 	{
 		back();
+		htim4.Instance->CCR3 = PWM;
+		htim4.Instance->CCR1 = PWM;
 	}
 }
 
@@ -485,9 +488,11 @@ int main(void)
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
   HAL_TIM_Base_Start(&htim1); // delay_us
-	HAL_TIM_IC_Start_DMA(&htim2, TIM_CHANNEL_1, distance_left, sizeof(distance_left));
-	HAL_TIM_IC_Start_DMA(&htim5, TIM_CHANNEL_1, distance_front, sizeof(distance_front));
-	HAL_TIM_IC_Start_DMA(&htim1, TIM_CHANNEL_1, distance_right, sizeof(distance_right));
+  HAL_TIM_IC_Start(&htim2, TIM_CHANNEL_1);
+  HAL_TIM_IC_Start(&htim5, TIM_CHANNEL_1);
+  HAL_TIM_IC_Start(&htim1, TIM_CHANNEL_1);
+  htim4.Instance->CCR1 = PWM;
+  htim4.Instance->CCR3 = PWM;
 
 
 //

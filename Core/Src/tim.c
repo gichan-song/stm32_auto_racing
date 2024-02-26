@@ -28,9 +28,6 @@ TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim4;
 TIM_HandleTypeDef htim5;
-DMA_HandleTypeDef hdma_tim1_ch1;
-DMA_HandleTypeDef hdma_tim2_ch1;
-DMA_HandleTypeDef hdma_tim5_ch1;
 
 /* TIM1 init function */
 void MX_TIM1_Init(void)
@@ -192,9 +189,9 @@ void MX_TIM5_Init(void)
 
   /* USER CODE END TIM5_Init 1 */
   htim5.Instance = TIM5;
-  htim5.Init.Prescaler = 0;
+  htim5.Init.Prescaler = 84-1;
   htim5.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim5.Init.Period = 4294967295;
+  htim5.Init.Period = 0xffff-1;
   htim5.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim5.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_IC_Init(&htim5) != HAL_OK)
@@ -210,7 +207,7 @@ void MX_TIM5_Init(void)
   sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
   sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
   sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
-  sConfigIC.ICFilter = 0;
+  sConfigIC.ICFilter = 15;
   if (HAL_TIM_IC_ConfigChannel(&htim5, &sConfigIC, TIM_CHANNEL_1) != HAL_OK)
   {
     Error_Handler();
@@ -243,25 +240,6 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = GPIO_AF1_TIM1;
     HAL_GPIO_Init(EchoR_GPIO_Port, &GPIO_InitStruct);
-
-    /* TIM1 DMA Init */
-    /* TIM1_CH1 Init */
-    hdma_tim1_ch1.Instance = DMA2_Stream1;
-    hdma_tim1_ch1.Init.Channel = DMA_CHANNEL_6;
-    hdma_tim1_ch1.Init.Direction = DMA_PERIPH_TO_MEMORY;
-    hdma_tim1_ch1.Init.PeriphInc = DMA_PINC_DISABLE;
-    hdma_tim1_ch1.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_tim1_ch1.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-    hdma_tim1_ch1.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
-    hdma_tim1_ch1.Init.Mode = DMA_NORMAL;
-    hdma_tim1_ch1.Init.Priority = DMA_PRIORITY_LOW;
-    hdma_tim1_ch1.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-    if (HAL_DMA_Init(&hdma_tim1_ch1) != HAL_OK)
-    {
-      Error_Handler();
-    }
-
-    __HAL_LINKDMA(tim_baseHandle,hdma[TIM_DMA_ID_CC1],hdma_tim1_ch1);
 
     /* TIM1 interrupt Init */
     HAL_NVIC_SetPriority(TIM1_BRK_TIM9_IRQn, 15, 0);
@@ -297,25 +275,6 @@ void HAL_TIM_IC_MspInit(TIM_HandleTypeDef* tim_icHandle)
     GPIO_InitStruct.Alternate = GPIO_AF1_TIM2;
     HAL_GPIO_Init(EchoL_GPIO_Port, &GPIO_InitStruct);
 
-    /* TIM2 DMA Init */
-    /* TIM2_CH1 Init */
-    hdma_tim2_ch1.Instance = DMA1_Stream5;
-    hdma_tim2_ch1.Init.Channel = DMA_CHANNEL_3;
-    hdma_tim2_ch1.Init.Direction = DMA_PERIPH_TO_MEMORY;
-    hdma_tim2_ch1.Init.PeriphInc = DMA_PINC_DISABLE;
-    hdma_tim2_ch1.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_tim2_ch1.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
-    hdma_tim2_ch1.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
-    hdma_tim2_ch1.Init.Mode = DMA_NORMAL;
-    hdma_tim2_ch1.Init.Priority = DMA_PRIORITY_LOW;
-    hdma_tim2_ch1.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-    if (HAL_DMA_Init(&hdma_tim2_ch1) != HAL_OK)
-    {
-      Error_Handler();
-    }
-
-    __HAL_LINKDMA(tim_icHandle,hdma[TIM_DMA_ID_CC1],hdma_tim2_ch1);
-
     /* TIM2 interrupt Init */
     HAL_NVIC_SetPriority(TIM2_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(TIM2_IRQn);
@@ -342,25 +301,9 @@ void HAL_TIM_IC_MspInit(TIM_HandleTypeDef* tim_icHandle)
     GPIO_InitStruct.Alternate = GPIO_AF2_TIM5;
     HAL_GPIO_Init(EchoC_GPIO_Port, &GPIO_InitStruct);
 
-    /* TIM5 DMA Init */
-    /* TIM5_CH1 Init */
-    hdma_tim5_ch1.Instance = DMA1_Stream2;
-    hdma_tim5_ch1.Init.Channel = DMA_CHANNEL_6;
-    hdma_tim5_ch1.Init.Direction = DMA_PERIPH_TO_MEMORY;
-    hdma_tim5_ch1.Init.PeriphInc = DMA_PINC_DISABLE;
-    hdma_tim5_ch1.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_tim5_ch1.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
-    hdma_tim5_ch1.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
-    hdma_tim5_ch1.Init.Mode = DMA_NORMAL;
-    hdma_tim5_ch1.Init.Priority = DMA_PRIORITY_LOW;
-    hdma_tim5_ch1.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-    if (HAL_DMA_Init(&hdma_tim5_ch1) != HAL_OK)
-    {
-      Error_Handler();
-    }
-
-    __HAL_LINKDMA(tim_icHandle,hdma[TIM_DMA_ID_CC1],hdma_tim5_ch1);
-
+    /* TIM5 interrupt Init */
+    HAL_NVIC_SetPriority(TIM5_IRQn, 5, 0);
+    HAL_NVIC_EnableIRQ(TIM5_IRQn);
   /* USER CODE BEGIN TIM5_MspInit 1 */
 
   /* USER CODE END TIM5_MspInit 1 */
@@ -427,9 +370,6 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
     */
     HAL_GPIO_DeInit(EchoR_GPIO_Port, EchoR_Pin);
 
-    /* TIM1 DMA DeInit */
-    HAL_DMA_DeInit(tim_baseHandle->hdma[TIM_DMA_ID_CC1]);
-
     /* TIM1 interrupt Deinit */
     HAL_NVIC_DisableIRQ(TIM1_BRK_TIM9_IRQn);
     HAL_NVIC_DisableIRQ(TIM1_CC_IRQn);
@@ -455,9 +395,6 @@ void HAL_TIM_IC_MspDeInit(TIM_HandleTypeDef* tim_icHandle)
     */
     HAL_GPIO_DeInit(EchoL_GPIO_Port, EchoL_Pin);
 
-    /* TIM2 DMA DeInit */
-    HAL_DMA_DeInit(tim_icHandle->hdma[TIM_DMA_ID_CC1]);
-
     /* TIM2 interrupt Deinit */
     HAL_NVIC_DisableIRQ(TIM2_IRQn);
   /* USER CODE BEGIN TIM2_MspDeInit 1 */
@@ -477,8 +414,8 @@ void HAL_TIM_IC_MspDeInit(TIM_HandleTypeDef* tim_icHandle)
     */
     HAL_GPIO_DeInit(EchoC_GPIO_Port, EchoC_Pin);
 
-    /* TIM5 DMA DeInit */
-    HAL_DMA_DeInit(tim_icHandle->hdma[TIM_DMA_ID_CC1]);
+    /* TIM5 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(TIM5_IRQn);
   /* USER CODE BEGIN TIM5_MspDeInit 1 */
 
   /* USER CODE END TIM5_MspDeInit 1 */
