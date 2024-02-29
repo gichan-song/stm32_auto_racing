@@ -22,11 +22,10 @@
 #include "task.h"
 #include "main.h"
 #include "cmsis_os.h"
-#include "usart.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "usart.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -156,11 +155,9 @@ void trigUltrasonicfunc(void *argument)
 	  if(flag)
 	  {
 		  Trig1();
-		  osDelay(1);
-		  Trig2();
-		  osDelay(1);
+		  osDelay(2);
 		  Trig3();
-		  osDelay(100);
+		  osDelay(10);
 	  }
   }
   /* USER CODE END trigUltrasonicfunc */

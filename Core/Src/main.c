@@ -19,7 +19,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
-#include "dma.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -58,13 +57,13 @@
 uint8_t rx_Data[1];
 uint8_t state = 0;
 uint8_t flag = 0;
-int PWM = 250;
+int PWM = 300;
 
 #define ARRAYNUM 5
-int readings_front[ARRAYNUM];      // the readings_front from the analog input
-int idx_front = 0;              // the index of the current reading
-int total_front = 0;                  // the running total_front
-int average_front = 0;
+//int readings_front[ARRAYNUM];      // the readings_front from the analog input
+//int idx_front = 0;              // the index of the current reading
+//int total_front = 0;                  // the running total_front
+//int average_front = 0;
 
 int readings_left[ARRAYNUM];      // the readings from the analog input
 int idx_left = 0;              // the index of the current reading
@@ -76,11 +75,11 @@ int idx_right = 0;              // the index of the current reading
 int total_right = 0;                  // the running total
 int average_right = 0;
 
-volatile uint32_t INC_Value1 = 0;
-volatile uint32_t INC_Value2 = 0;
-volatile uint32_t echoTime_front = 0;
-volatile uint8_t captureFlag1 = 0;
-volatile uint32_t distance_front = 0;
+//volatile uint32_t INC_Value1 = 0;
+//volatile uint32_t INC_Value2 = 0;
+//volatile uint32_t echoTime_front = 0;
+//volatile uint8_t captureFlag1 = 0;
+//volatile uint32_t distance_front = 0;
 
 volatile uint32_t INC_Value3 = 0;
 volatile uint32_t INC_Value4 = 0;
@@ -110,53 +109,53 @@ void delay_us(uint16_t us)
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
-	if(htim->Instance == TIM5)
-	{
-		if(captureFlag1 == 0)	// first value is not capture
-		{
-			INC_Value1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);	// read first value
-			captureFlag1 = 1;	// first captured as true
-
-			// change polarity rising edge to falling edge
-			__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_FALLING);
-		}
-		else if(captureFlag1 == 1)	// if first value already captured
-		{
-			INC_Value2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
-
-			if(INC_Value2 > INC_Value1)
-			{
-				echoTime_front = INC_Value2 - INC_Value1;
-			}
-			else if(INC_Value2 < INC_Value1)
-			{
-				echoTime_front = (0xffff - INC_Value1) + INC_Value2;
-			}
-
-			distance_front = echoTime_front / 58;
-			captureFlag1 = 0;
-
-			 total_front = total_front - readings_front[idx_front];
-				  // read from the sensor:
-				  readings_front[idx_front] = distance_front;
-				  // add the reading to the total_front:
-				  total_front = total_front + readings_front[idx_front];
-				  // advance to the next position in the array:
-				  idx_front = idx_front + 1;
-
-				  // if we're at the end of the array...
-				  if (idx_front >= ARRAYNUM) {
-					  // ...wrap around to the beginning:
-					  idx_front = 0;
-				  }
-				  // calculate the average_front:
-				  average_front = total_front / ARRAYNUM;
-
-			__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING);
-			__HAL_TIM_DISABLE_IT(&htim5, TIM_IT_CC1);
-		}
-	}
-	else if(htim->Instance == TIM2)
+//	if(htim->Instance == TIM5)
+//	{
+//		if(captureFlag1 == 0)	// first value is not capture
+//		{
+//			INC_Value1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);	// read first value
+//			captureFlag1 = 1;	// first captured as true
+//
+//			// change polarity rising edge to falling edge
+//			__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_FALLING);
+//		}
+//		else if(captureFlag1 == 1)	// if first value already captured
+//		{
+//			INC_Value2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+//
+//			if(INC_Value2 > INC_Value1)
+//			{
+//				echoTime_front = INC_Value2 - INC_Value1;
+//			}
+//			else if(INC_Value2 < INC_Value1)
+//			{
+//				echoTime_front = (0xffff - INC_Value1) + INC_Value2;
+//			}
+//
+//			distance_front = echoTime_front / 58;
+//			captureFlag1 = 0;
+//
+//			 total_front = total_front - readings_front[idx_front];
+//				  // read from the sensor:
+//				  readings_front[idx_front] = distance_front;
+//				  // add the reading to the total_front:
+//				  total_front = total_front + readings_front[idx_front];
+//				  // advance to the next position in the array:
+//				  idx_front = idx_front + 1;
+//
+//				  // if we're at the end of the array...
+//				  if (idx_front >= ARRAYNUM) {
+//					  // ...wrap around to the beginning:
+//					  idx_front = 0;
+//				  }
+//				  // calculate the average_front:
+//				  average_front = total_front / ARRAYNUM;
+//
+//			__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING);
+//			__HAL_TIM_DISABLE_IT(&htim5, TIM_IT_CC1);
+//		}
+//	}
+	if(htim->Instance == TIM2)
 	{
 		if(captureFlag2 == 0)	// first value is not capture
 		{
@@ -253,19 +252,15 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 //		stop();
 //		return;
 //	}
-	go();
-	if(average_right < 30){
-		left();
-		return;
-	}
 	if(average_left < 30){
 		right();
 		return;
 	}
-	if(average_front < 15){
-		right();
+	if(average_right < 30){
+		left();
 		return;
 	}
+	go();
 }
 
 void Trig1(void)
@@ -277,14 +272,14 @@ void Trig1(void)
 	__HAL_TIM_ENABLE_IT(&htim2, TIM_IT_CC1);	// SET Timer Enable
 }
 
-void Trig2(void)
-{
-	HAL_GPIO_WritePin(TrigC_GPIO_Port, TrigC_Pin, 1);	// Trig Pin High
-	delay_us(10);								// delay 10us
-	HAL_GPIO_WritePin(TrigC_GPIO_Port, TrigC_Pin, 0);	// Trig Pin Low
-
-	__HAL_TIM_ENABLE_IT(&htim5, TIM_IT_CC1);	// SET Timer Enable
-}
+//void Trig2(void)
+//{
+//	HAL_GPIO_WritePin(TrigC_GPIO_Port, TrigC_Pin, 1);	// Trig Pin High
+//	delay_us(10);								// delay 10us
+//	HAL_GPIO_WritePin(TrigC_GPIO_Port, TrigC_Pin, 0);	// Trig Pin Low
+//
+//	__HAL_TIM_ENABLE_IT(&htim5, TIM_IT_CC1);	// SET Timer Enable
+//}
 
 void Trig3(void)
 {
@@ -295,7 +290,7 @@ void Trig3(void)
 	__HAL_TIM_ENABLE_IT(&htim1, TIM_IT_CC1);	// SET Timer Enable
 }
 
-void go()		// ?���?????????? ?��?��
+void go()		// ?���??????????? ?��?��
 {
 	HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, 1);	// Right ?��?��?��
 	HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, 0);
@@ -304,7 +299,7 @@ void go()		// ?���?????????? ?��?��
 	//printf("This is Forward Function\r\n");	myDelay(500);
 }
 
-void back()		// ?���????????? ?��?��
+void back()		// ?���?????????? ?��?��
 {
 	HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, 0);	// Right ?��?��?��
 	HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, 1);
@@ -477,7 +472,6 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_DMA_Init();
   MX_USART2_UART_Init();
   MX_USART1_UART_Init();
   MX_TIM4_Init();
@@ -489,7 +483,7 @@ int main(void)
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
   HAL_TIM_Base_Start(&htim1); // delay_us
   HAL_TIM_IC_Start(&htim2, TIM_CHANNEL_1);
-  HAL_TIM_IC_Start(&htim5, TIM_CHANNEL_1);
+//  HAL_TIM_IC_Start(&htim5, TIM_CHANNEL_1);
   HAL_TIM_IC_Start(&htim1, TIM_CHANNEL_1);
   htim4.Instance->CCR1 = PWM;
   htim4.Instance->CCR3 = PWM;
